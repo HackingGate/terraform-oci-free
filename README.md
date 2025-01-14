@@ -23,7 +23,7 @@ Generate RSA key pair that will be used to SSH into instance.
 For more details, check [docs](https://docs.oracle.com/en-us/iaas/Content/Identity/Tasks/managingcredentials.htm).
 
 ```bash
-ssh-keygen -t rsa -b 4096 -C oci -f ~/.ssh/oci_free
+ssh-keygen -t ed25519 -C oci -f ~/.ssh/oci_free
 ```
 
 ## Configure backend
@@ -37,7 +37,7 @@ endpoint = "https://<namespace>.compat.objectstorage.<home region>.oraclecloud.c
 
 For more details, check [docs](https://docs.oracle.com/en-us/iaas/Content/API/SDKDocs/terraformUsingObjectStore.htm).
 
-Go to `Profile >> My profile >> Customer secret keys` and `Generate secret key`. Create [Customer Secret key](https://docs.oracle.com/en-us/iaas/Content/Identity/Tasks/managingcredentials.htm#create-secret-key) and save access key and secret key in `credentials` file. 
+Go to `Profile >> My profile >> Customer secret keys` and `Generate secret key`. Create [Customer Secret key](https://docs.oracle.com/en-us/iaas/Content/Identity/Tasks/managingcredentials.htm#create-secret-key) and save access key and secret key in `credentials` file.
 
 ```bash
 [default]

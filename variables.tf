@@ -32,7 +32,7 @@ variable "image_operating_system" {
 variable "image_operating_system_version" {
   description = "The image's operating system version."
   type        = string
-  default     = "22.04"
+  default     = "24.04"
 }
 
 variable "instance_hostname" {

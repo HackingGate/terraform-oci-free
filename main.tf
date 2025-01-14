@@ -1,13 +1,13 @@
 terraform {
-  required_version = ">= 1.3.7"
+  required_version = ">= 1.10.4"
 
   required_providers {
     oci = {
-      version = ">= 4.104.0"
+      version = ">= 6.21.0"
     }
     tls = {
       source  = "hashicorp/tls"
-      version = "4.0.4"
+      version = "4.0.6"
     }
   }
 
@@ -44,7 +44,7 @@ resource "oci_identity_compartment" "free_compartment" {
 # https://registry.terraform.io/providers/oracle/oci/latest/docs/resources/core_vcn
 
 resource "oci_core_vcn" "free_vcn" {
-  cidr_block     = "10.1.0.0/16"
+  cidr_block     = "10.0.0.0/16"
   compartment_id = oci_identity_compartment.free_compartment.id
   display_name   = "freeVCN"
   dns_label      = "freevcn"
@@ -53,7 +53,7 @@ resource "oci_core_vcn" "free_vcn" {
 # https://registry.terraform.io/providers/oracle/oci/latest/docs/resources/core_subnet
 
 resource "oci_core_subnet" "free_subnet" {
-  cidr_block        = "10.1.20.0/24"
+  cidr_block        = "10.0.20.0/24"
   display_name      = "freeSubnet"
   dns_label         = "freesubnet"
   security_list_ids = [oci_core_security_list.free_security_list.id]
@@ -115,8 +115,9 @@ resource "tls_private_key" "instance_ssh_key" {
 
 # https://registry.terraform.io/providers/oracle/oci/latest/docs/resources/core_instance
 
+
 resource "oci_core_instance" "free_instance" {
-  availability_domain = data.oci_identity_availability_domains.ads.availability_domains[2].name
+  availability_domain = data.oci_identity_availability_domains.ads.availability_domains[0].name
   compartment_id      = oci_identity_compartment.free_compartment.id
   shape               = var.instance_shape
   display_name        = "freeInstance"
