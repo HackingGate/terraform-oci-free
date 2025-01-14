@@ -32,7 +32,7 @@ Create bucket named `tfstate` and get [namespace](https://docs.oracle.com/en-us/
 
 ```bash
 region   = "<home region>"
-endpoint = "https://<namespace>.compat.objectstorage.<home region>.oraclecloud.com"
+endpoints = { s3 = "https://<namespace>.compat.objectstorage.<home region>.oraclecloud.com" }
 ```
 
 For more details, check [docs](https://docs.oracle.com/en-us/iaas/Content/API/SDKDocs/terraformUsingObjectStore.htm).

@@ -3,6 +3,7 @@ terraform {
 
   required_providers {
     oci = {
+      source = "oracle/oci"
       version = ">= 6.21.0"
     }
     tls = {
@@ -14,11 +15,14 @@ terraform {
   backend "s3" {
     bucket                      = "tfstate"
     key                         = "free/terraform.tfstate"
-    shared_credentials_file     = "credentials"
+    shared_credentials_files    = ["credentials"]
+    profile                     = "default"
     skip_region_validation      = true
     skip_credentials_validation = true
+    skip_requesting_account_id  = true
     skip_metadata_api_check     = true
-    force_path_style            = true
+    skip_s3_checksum            = true
+    use_path_style              = true
   }
 }
 
