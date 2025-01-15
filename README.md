@@ -64,17 +64,16 @@ ssh -i ~/.ssh/oci ubuntu@public_ip
 
 | Name | Version |
 |------|---------|
-| <a name="requirement_terraform"></a> [terraform](#requirement\_terraform) | >= 1.3.7 |
-| <a name="requirement_oci"></a> [oci](#requirement\_oci) | >= 4.104.0 |
-| <a name="requirement_tls"></a> [tls](#requirement\_tls) | 4.0.4 |
+| <a name="requirement_terraform"></a> [terraform](#requirement\_terraform) | >= 1.10.4 |
+| <a name="requirement_oci"></a> [oci](#requirement\_oci) | >= 6.21.0 |
+| <a name="requirement_tls"></a> [tls](#requirement\_tls) | 4.0.6 |
 
 ## Providers
 
 | Name | Version |
 |------|---------|
-| <a name="provider_local"></a> [local](#provider\_local) | 2.3.0 |
-| <a name="provider_oci"></a> [oci](#provider\_oci) | 4.104.2 |
-| <a name="provider_tls"></a> [tls](#provider\_tls) | 4.0.4 |
+| <a name="provider_oci"></a> [oci](#provider\_oci) | 6.21.0 |
+| <a name="provider_tls"></a> [tls](#provider\_tls) | 4.0.6 |
 
 ## Modules
 
@@ -103,7 +102,7 @@ No modules.
 |------|-------------|------|---------|:--------:|
 | <a name="input_fingerprint"></a> [fingerprint](#input\_fingerprint) | The fingerprint for the user's RSA key. This can be found in user settings in the Oracle Cloud Infrastructure console. Required if auth is set to 'ApiKey', ignored otherwise. | `string` | n/a | yes |
 | <a name="input_image_operating_system"></a> [image\_operating\_system](#input\_image\_operating\_system) | The image's operating system. | `string` | `"Canonical Ubuntu"` | no |
-| <a name="input_image_operating_system_version"></a> [image\_operating\_system\_version](#input\_image\_operating\_system\_version) | The image's operating system version. | `string` | `"22.04"` | no |
+| <a name="input_image_operating_system_version"></a> [image\_operating\_system\_version](#input\_image\_operating\_system\_version) | The image's operating system version. | `string` | `"24.04"` | no |
 | <a name="input_instance_boot_volume_size"></a> [instance\_boot\_volume\_size](#input\_instance\_boot\_volume\_size) | The size of the boot volume in GBs. Minimum value is 50 GB and maximum value is 32,768 GB (32 TB). | `number` | `200` | no |
 | <a name="input_instance_hostname"></a> [instance\_hostname](#input\_instance\_hostname) | A user-friendly name. Does not have to be unique, and it's changeable. Avoid entering confidential information. | `string` | `"free"` | no |
 | <a name="input_instance_memory"></a> [instance\_memory](#input\_instance\_memory) | The total amount of memory available to the instance, in gigabytes. | `number` | `24` | no |
