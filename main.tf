@@ -48,16 +48,19 @@ resource "oci_identity_compartment" "free_compartment" {
 # https://registry.terraform.io/providers/oracle/oci/latest/docs/resources/core_vcn
 
 resource "oci_core_vcn" "free_vcn" {
-  cidr_block     = "10.0.0.0/16"
-  compartment_id = oci_identity_compartment.free_compartment.id
-  display_name   = "freeVCN"
-  dns_label      = "freevcn"
+  cidr_block              = "10.0.0.0/16"
+  ipv6private_cidr_blocks = [ "fd00:10::/48" ]
+  is_ipv6enabled          = true
+  compartment_id          = oci_identity_compartment.free_compartment.id
+  display_name            = "freeVCN"
+  dns_label               = "freevcn"
 }
 
 # https://registry.terraform.io/providers/oracle/oci/latest/docs/resources/core_subnet
 
 resource "oci_core_subnet" "free_subnet" {
   cidr_block        = "10.0.20.0/24"
+  ipv6cidr_block    = cidrsubnet(oci_core_vcn.free_vcn.ipv6cidr_blocks[0], 8, 0) # Expand /56 to /64
   display_name      = "freeSubnet"
   dns_label         = "freesubnet"
   security_list_ids = [oci_core_security_list.free_security_list.id]
@@ -87,6 +90,12 @@ resource "oci_core_route_table" "free_route_table" {
     destination_type  = "CIDR_BLOCK"
     network_entity_id = oci_core_internet_gateway.free_internet_gateway.id
   }
+
+  route_rules {
+    destination       = "::/0"
+    destination_type  = "CIDR_BLOCK"
+    network_entity_id = oci_core_internet_gateway.free_internet_gateway.id
+  }
 }
 
 # https://registry.terraform.io/providers/oracle/oci/latest/docs/resources/core_security_list
@@ -101,9 +110,24 @@ resource "oci_core_security_list" "free_security_list" {
     destination = "0.0.0.0/0"
   }
 
+  egress_security_rules {
+    protocol    = "6"
+    destination = "::/0"
+  }
+
   ingress_security_rules {
     protocol = "6"
     source   = "0.0.0.0/0"
+
+    tcp_options {
+      max = "22"
+      min = "22"
+    }
+  }
+
+  ingress_security_rules {
+    protocol = "6"
+    source   = "::/0"
 
     tcp_options {
       max = "22"
@@ -139,6 +163,7 @@ resource "oci_core_instance" "free_instance" {
 
   create_vnic_details {
     assign_public_ip = true
+    assign_ipv6ip    = true
     subnet_id        = oci_core_subnet.free_subnet.id
     display_name     = var.instance_hostname
   }
