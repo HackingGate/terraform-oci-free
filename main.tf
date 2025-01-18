@@ -3,7 +3,7 @@ terraform {
 
   required_providers {
     oci = {
-      source = "oracle/oci"
+      source  = "oracle/oci"
       version = ">= 6.21.0"
     }
     tls = {
@@ -49,7 +49,7 @@ resource "oci_identity_compartment" "free_compartment" {
 
 resource "oci_core_vcn" "free_vcn" {
   cidr_block              = "10.0.0.0/16"
-  ipv6private_cidr_blocks = [ "fd00:10::/48" ]
+  ipv6private_cidr_blocks = ["fd00:10::/48"]
   is_ipv6enabled          = true
   compartment_id          = oci_identity_compartment.free_compartment.id
   display_name            = "freeVCN"
