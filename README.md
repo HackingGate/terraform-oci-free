@@ -18,7 +18,7 @@ Go to `Profile >> My profile >> API keys` and `Add API key`. Paste public key an
 
 ### Optionally
 
-Generate RSA key pair that will be used to SSH into instance.
+Generate ed25519 key pair that will be used to SSH into instance.
 
 For more details, check [docs](https://docs.oracle.com/en-us/iaas/Content/Identity/Tasks/managingcredentials.htm).
 
@@ -26,29 +26,40 @@ For more details, check [docs](https://docs.oracle.com/en-us/iaas/Content/Identi
 ssh-keygen -t ed25519 -C oci -f ~/.ssh/oci_free
 ```
 
-## Configure backend
+## Configuration
 
-Create bucket named `tfstate` and get [namespace](https://docs.oracle.com/en-us/iaas/Content/Object/Tasks/understandingnamespaces.htm). Save home region and endpoint details in `backend.conf` file.
+### 1. Create terraform.tfvars
 
-```bash
-region   = "<home region>"
-endpoints = { s3 = "https://<namespace>.compat.objectstorage.<home region>.oraclecloud.com" }
+Create a `terraform.tfvars` file with your OCI configuration:
+
+```hcl
+user                     = "ocid1.user.oc1..your_user_ocid"
+fingerprint              = "your:api:key:fingerprint"
+tenancy                  = "ocid1.tenancy.oc1..your_tenancy_ocid"
+region                   = "your_region"
+namespace                = "your_object_storage_namespace"
+key_file                 = "~/.oci/oci.pem"
+instance_public_key_path = "~/.ssh/oci_free.pub"  # Optional: leave empty to auto-generate
 ```
 
-For more details, check [docs](https://docs.oracle.com/en-us/iaas/Content/API/SDKDocs/terraformUsingObjectStore.htm).
+### 2. Configure Backend
 
-Go to `Profile >> My profile >> Customer secret keys` and `Generate secret key`. Create [Customer Secret key](https://docs.oracle.com/en-us/iaas/Content/Identity/Tasks/managingcredentials.htm#create-secret-key) and save access key and secret key in `credentials` file.
+Create a `state.config` file for backend configuration:
 
-```bash
-[default]
-aws_access_key_id=...
-aws_secret_access_key=...
+```hcl
+bucket           = "tfstate"
+key              = "free/terraform.tfstate"
+region           = "your_region"
+namespace        = "your_object_storage_namespace"
+user_ocid        = "ocid1.user.oc1..your_user_ocid"
+fingerprint      = "your:api:key:fingerprint"
+tenancy_ocid     = "ocid1.tenancy.oc1..your_tenancy_ocid"
+private_key_path = "~/.oci/oci.pem"
 ```
 
 ## Create instance
-
 ```bash
-terraform init -backend-config=backend.conf
+terraform init -backend-config=state.config
 terraform plan -var-file=terraform.tfvars
 terraform apply -var-file=terraform.tfvars
 ```
@@ -56,7 +67,12 @@ terraform apply -var-file=terraform.tfvars
 ## Connect to instance
 
 ```bash
-ssh -i ~/.ssh/oci ubuntu@public_ip
+# Check the instance's public IP
+terraform output instance-public-ip
+# SSH into the instance
+ssh -i ~/.ssh/oci_free ubuntu@<public_ip>
+# Or this command in one
+ssh -i ~/.ssh/oci_free ubuntu@$(terraform output -raw instance-public-ip)
 ```
 
 <!-- BEGIN_TF_DOCS -->
@@ -64,16 +80,16 @@ ssh -i ~/.ssh/oci ubuntu@public_ip
 
 | Name | Version |
 |------|---------|
-| <a name="requirement_terraform"></a> [terraform](#requirement\_terraform) | >= 1.10.4 |
-| <a name="requirement_oci"></a> [oci](#requirement\_oci) | >= 6.21.0 |
-| <a name="requirement_tls"></a> [tls](#requirement\_tls) | 4.0.6 |
+| <a name="requirement_terraform"></a> [terraform](#requirement\_terraform) | >= 1.13.0 |
+| <a name="requirement_oci"></a> [oci](#requirement\_oci) | ~> 7.15.0 |
+| <a name="requirement_tls"></a> [tls](#requirement\_tls) | ~> 4.1.0 |
 
 ## Providers
 
 | Name | Version |
 |------|---------|
-| <a name="provider_oci"></a> [oci](#provider\_oci) | 6.21.0 |
-| <a name="provider_tls"></a> [tls](#provider\_tls) | 4.0.6 |
+| <a name="provider_oci"></a> [oci](#provider\_oci) | ~> 7.15.0 |
+| <a name="provider_tls"></a> [tls](#provider\_tls) | ~> 4.1.0 |
 
 ## Modules
 
@@ -83,18 +99,16 @@ No modules.
 
 | Name | Type |
 |------|------|
-| [local_file.instance_ssh_private_key](https://registry.terraform.io/providers/hashicorp/local/latest/docs/resources/file) | resource |
-| [local_file.instance_ssh_public_key](https://registry.terraform.io/providers/hashicorp/local/latest/docs/resources/file) | resource |
-| [oci_core_instance.free_instance](https://registry.terraform.io/providers/hashicorp/oci/latest/docs/resources/core_instance) | resource |
-| [oci_core_internet_gateway.free_internet_gateway](https://registry.terraform.io/providers/hashicorp/oci/latest/docs/resources/core_internet_gateway) | resource |
-| [oci_core_route_table.free_route_table](https://registry.terraform.io/providers/hashicorp/oci/latest/docs/resources/core_route_table) | resource |
-| [oci_core_security_list.free_security_list](https://registry.terraform.io/providers/hashicorp/oci/latest/docs/resources/core_security_list) | resource |
-| [oci_core_subnet.free_subnet](https://registry.terraform.io/providers/hashicorp/oci/latest/docs/resources/core_subnet) | resource |
-| [oci_core_vcn.free_vcn](https://registry.terraform.io/providers/hashicorp/oci/latest/docs/resources/core_vcn) | resource |
-| [oci_identity_compartment.free_compartment](https://registry.terraform.io/providers/hashicorp/oci/latest/docs/resources/identity_compartment) | resource |
-| [tls_private_key.instance_ssh_private_key](https://registry.terraform.io/providers/hashicorp/tls/4.0.4/docs/resources/private_key) | resource |
-| [oci_core_images.instance_images](https://registry.terraform.io/providers/hashicorp/oci/latest/docs/data-sources/core_images) | data source |
-| [oci_identity_availability_domains.ads](https://registry.terraform.io/providers/hashicorp/oci/latest/docs/data-sources/identity_availability_domains) | data source |
+| [oci_core_instance.free_instance](https://registry.terraform.io/providers/oracle/oci/latest/docs/resources/core_instance) | resource |
+| [oci_core_internet_gateway.free_internet_gateway](https://registry.terraform.io/providers/oracle/oci/latest/docs/resources/core_internet_gateway) | resource |
+| [oci_core_route_table.free_route_table](https://registry.terraform.io/providers/oracle/oci/latest/docs/resources/core_route_table) | resource |
+| [oci_core_security_list.free_security_list](https://registry.terraform.io/providers/oracle/oci/latest/docs/resources/core_security_list) | resource |
+| [oci_core_subnet.free_subnet](https://registry.terraform.io/providers/oracle/oci/latest/docs/resources/core_subnet) | resource |
+| [oci_core_vcn.free_vcn](https://registry.terraform.io/providers/oracle/oci/latest/docs/resources/core_vcn) | resource |
+| [oci_identity_compartment.free_compartment](https://registry.terraform.io/providers/oracle/oci/latest/docs/resources/identity_compartment) | resource |
+| [tls_private_key.instance_ssh_key](https://registry.terraform.io/providers/hashicorp/tls/latest/docs/resources/private_key) | resource |
+| [oci_core_images.instance_images](https://registry.terraform.io/providers/oracle/oci/latest/docs/data-sources/core_images) | data source |
+| [oci_identity_availability_domains.ads](https://registry.terraform.io/providers/oracle/oci/latest/docs/data-sources/identity_availability_domains) | data source |
 
 ## Inputs
 
@@ -111,6 +125,7 @@ No modules.
 | <a name="input_instance_shape"></a> [instance\_shape](#input\_instance\_shape) | The shape of an instance. The shape determines the number of CPUs, amount of memory, and other resources allocated to the instance. | `string` | `"VM.Standard.A1.Flex"` | no |
 | <a name="input_private_key_path"></a> [private\_key\_path](#input\_private\_key\_path) | The path to the user's PEM formatted private key. A private\_key or a private\_key\_path must be provided if auth is set to 'ApiKey', ignored otherwise. | `string` | n/a | yes |
 | <a name="input_region"></a> [region](#input\_region) | The region for API connections (e.g. us-ashburn-1). | `string` | n/a | yes |
+| <a name="input_namespace"></a> [namespace](#input\_namespace) | The namespace of the OCI Object Storage. | `string` | n/a | yes |
 | <a name="input_tenancy_ocid"></a> [tenancy\_ocid](#input\_tenancy\_ocid) | The tenancy OCID for a user. The tenancy OCID can be found at the bottom of user settings in the Oracle Cloud Infrastructure console. Required if auth is set to 'ApiKey', ignored otherwise. | `string` | n/a | yes |
 | <a name="input_user_ocid"></a> [user\_ocid](#input\_user\_ocid) | The user OCID. This can be found in user settings in the Oracle Cloud Infrastructure console. Required if auth is set to 'ApiKey', ignored otherwise. | `string` | n/a | yes |
 

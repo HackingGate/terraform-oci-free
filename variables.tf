@@ -18,6 +18,11 @@ variable "region" {
   type        = string
 }
 
+variable "namespace" {
+  description = "The namespace of the OCI Object Storage."
+  type        = string
+}
+
 variable "key_file" {
   description = "The path to the user's PEM formatted private key. A private_key or a private_key_path must be provided if auth is set to 'ApiKey', ignored otherwise."
   type        = string

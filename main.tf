@@ -1,29 +1,18 @@
 terraform {
-  required_version = ">= 1.10.4"
+  required_version = ">= 1.13.0"
 
   required_providers {
     oci = {
       source  = "oracle/oci"
-      version = ">= 6.21.0"
+      version = "~> 7.15.0"
     }
     tls = {
       source  = "hashicorp/tls"
-      version = "4.0.6"
+      version = "~> 4.1.0"
     }
   }
 
-  backend "s3" {
-    bucket                      = "tfstate"
-    key                         = "free/terraform.tfstate"
-    shared_credentials_files    = ["credentials"]
-    profile                     = "default"
-    skip_region_validation      = true
-    skip_credentials_validation = true
-    skip_requesting_account_id  = true
-    skip_metadata_api_check     = true
-    skip_s3_checksum            = true
-    use_path_style              = true
-  }
+  backend "oci" {}
 }
 
 # https://registry.terraform.io/providers/oracle/oci/latest/docs
