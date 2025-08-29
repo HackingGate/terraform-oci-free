@@ -38,6 +38,6 @@ output "instance-public-ip" {
 }
 
 output "generated_private_key" {
-  value     = (var.instance_public_key_path != "") ? "" : tls_private_key.instance_ssh_key[1].private_key_pem
+  value     = (var.instance_public_key_path != "") ? "" : tls_private_key.instance_ssh_key[0].private_key_pem
   sensitive = true
 }

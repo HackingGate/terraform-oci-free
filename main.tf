@@ -126,7 +126,7 @@ resource "oci_core_security_list" "free_security_list" {
 }
 
 resource "tls_private_key" "instance_ssh_key" {
-  count     = var.instance_public_key_path != "" ? 1 : 0
+  count     = var.instance_public_key_path != "" ? 0 : 1
   algorithm = "ED25519"
 }
 
@@ -158,6 +158,6 @@ resource "oci_core_instance" "free_instance" {
   }
 
   metadata = {
-    ssh_authorized_keys = (var.instance_public_key_path != "") ? file("${var.instance_public_key_path}") : tls_private_key.instance_ssh_key[1].public_key_openssh
+    ssh_authorized_keys = (var.instance_public_key_path != "") ? file("${var.instance_public_key_path}") : tls_private_key.instance_ssh_key[0].public_key_openssh
   }
 }
